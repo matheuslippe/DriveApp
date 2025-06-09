@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlo Financeiro para Motorista</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Ecrã de Autenticação -->
+    <div id="auth-container">
+        <div class="card auth-card">
+            <h1>📊 Planilha Inteligente</h1>
+            <p id="auth-message">Faça login ou registe-se para aceder aos seus dados.</p>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="O seu e-mail" required>
+                <input type="password" id="login-password" placeholder="A sua senha" required>
+                <button type="submit">Entrar</button>
+            </form>
+            <form id="signup-form" class="hidden">
+                <input type="email" id="signup-email" placeholder="O seu e-mail" required>
+                <input type="password" id="signup-password" placeholder="Crie uma senha (mínimo 6 caracteres)" required>
+                <button type="submit">Registar e Entrar</button>
+            </form>
+            <p id="auth-error" class="error-message"></p>
+            <a href="#" id="toggle-auth">Não tem uma conta? Registe-se</a>
+        </div>
+    </div>
+
+    <!-- Ecrã Principal da Aplicação -->
+    <div id="app-container" class="container hidden">
+        <div class="header">
+            <h1>📊 Planilha Inteligente</h1>
+            <div class="header-controls">
+                <span id="user-email"></span>
+                <button id="logout-button">Sair</button>
+            </div>
+        </div>
+        
+        <div class="main-layout">
+            <div class="form-section">
+                <div class="card">
+                    <h2>Adicionar Novo Dia</h2>
+                    <form id="entry-form" class="form-grid">
+                        <div><label for="date">Data</label><input type="date" id="date" required></div>
+                        <div><label for="ganhos">Ganhos (R$)</label><input type="number" id="ganhos" step="0.01" placeholder="250,50" required></div>
+                        <div><label for="km">Km Rodados</label><input type="number" id="km" step="0.1" placeholder="150" value="0"></div>
+                        <div><label for="horas">Horas Trabalhadas</label><input type="time" id="horas" value="00:00"></div>
+                        <div><label for="combustivel">Combustível (R$)</label><input type="number" id="combustivel" step="0.01" placeholder="50,00" value="0"></div>
+                        <div><label for="outros">Outros Gastos (R$)</label><input type="number" id="outros" step="0.01" placeholder="15,00" value="0"></div>
+                        <button type="submit">Adicionar Lançamento</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>Configurações</h2>
+                    <div class="settings-forms-container">
+                        <form id="recurring-form" class="form-grid-small">
+                            <div><label for="aluguel-semanal">Aluguer Semanal (R$)</label><input type="number" id="aluguel-semanal" step="0.01" placeholder="400,00" value="0"></div>
+                            <button type="submit">Guardar Aluguer</button>
+                        </form>
+                        <form id="goal-form" class="form-grid-small">
+                            <div><label for="goal-input">Meta Mensal de Ganhos (R$)</label><input type="number" id="goal-input" step="100" placeholder="7000" value="0"></div>
+                            <button type="submit">Guardar Meta</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <div class="card">
+                    <h2>O meu Resumo</h2>
+                    <div class="filter-section">
+                        <label for="filter">Filtrar por:</label>
+                        <select id="filter"><option value="all">Todo o Período</option><option value="this_month">Este Mês</option><option value="last_month">Mês Passado</option><option value="last_7_days">Últimos 7 Dias</option><option value="today">Hoje</option></select>
+                        <button id="export-csv" class="export-btn">Exportar para CSV</button>
+                    </div>
+                    <div id="dashboard" class="dashboard"></div>
+                    <div id="goal-progress-container"></div>
+                    <div class="charts">
+                        <div class="chart-container"><canvas id="weeklyGoalChart"></canvas></div>
+                        <div class="chart-container"><canvas id="lucroChart"></canvas></div>
+                        <div class="chart-container"><canvas id="gastosChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Histórico de Lançamentos</h2>
+            <div class="table-wrapper">
+                <table id="entries-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="date">Data 🔽</th><th data-sort="ganhos">Ganhos</th><th data-sort="km">Km</th><th data-sort="horas">Horas</th><th data-sort="combustivel">Combustível</th><th data-sort="outros">Outros</th><th data-sort="lucro">Lucro (Bruto Dia)</th><th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+             <p class="notice">⭐ Os seus dados estão guardados e sincronizados na nuvem.</p>
+        </div>
+    </div>
+
+    <!-- Modal de Edição (escondido) -->
+    <div id="edit-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Editar Lançamento</h2>
+            <form id="edit-form">
+                <div class="form-grid">
+                    <div><label for="edit-date">Data</label><input type="date" id="edit-date" required></div>
+                    <div><label for="edit-ganhos">Ganhos (R$)</label><input type="number" id="edit-ganhos" step="0.01" required></div>
+                    <div><label for="edit-km">Km Rodados</label><input type="number" id="edit-km" step="0.1"></div>
+                    <div><label for="edit-horas">Horas Trabalhadas</label><input type="time" id="edit-horas"></div>
+                    <div><label for="edit-combustivel">Combustível (R$)</label><input type="number" id="edit-combustivel" step="0.01"></div>
+                    <div><label for="edit-outros">Outros Gastos (R$)</label><input type="number" id="edit-outros" step="0.01"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancel-edit">Cancelar</button>
+                    <button type="submit">Guardar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
