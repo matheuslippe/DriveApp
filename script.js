@@ -1,13 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     // FIREBASE CONFIG - COLE O SEU AQUI
 const firebaseConfig = {
-  apiKey: "AIzaSyDotk1gv71EBK6pY0O4CCvbsYRntqFDkLk",
-  authDomain: "malipersonalisae.firebaseapp.com",
-  projectId: "malipersonalisae",
-  storageBucket: "malipersonalisae.firebasestorage.app",
-  messagingSenderId: "875193186763",
-  appId: "1:875193186763:web:7003023a1baca7426cde4e",
-  measurementId: "G-T90VDJ3SCE"
+  apiKey: "AIzaSyALWKHaDpx7TI2hktGB4yPZW2TmxfyG3Fg",
+  authDomain: "meu-controle-de-motorista.firebaseapp.com",
+  projectId: "meu-controle-de-motorista",
+  storageBucket: "meu-controle-de-motorista.firebasestorage.app",
+  messagingSenderId: "228090160448",
+  appId: "1:228090160448:web:c5d0656d235043b5ba86a5"
 };
 
     // INICIALIZAÇÃO
