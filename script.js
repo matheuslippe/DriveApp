@@ -1,15 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     // FIREBASE CONFIG - COLE O SEU AQUI
 const firebaseConfig = {
-  apiKey: "AIzaSyDotk1gv71EBK6pY0O4CCvbsYRntqFDkLk",
-  authDomain: "malipersonalisae.firebaseapp.com",
-  projectId: "malipersonalisae",
-  storageBucket: "malipersonalisae.firebasestorage.app",
-  messagingSenderId: "875193186763",
-  appId: "1:875193186763:web:7003023a1baca7426cde4e",
-  measurementId: "G-T90VDJ3SCE"
+  apiKey: "AIzaSyALWKHaDpx7TI2hktGB4yPZW2TmxfyG3Fg",
+  authDomain: "meu-controle-de-motorista.firebaseapp.com",
+  projectId: "meu-controle-de-motorista",
+  storageBucket: "meu-controle-de-motorista.firebasestorage.app",
+  messagingSenderId: "228090160448",
+  appId: "1:228090160448:web:c5d0656d235043b5ba86a5"
 };
-
     // INICIALIZAÇÃO
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -50,7 +48,6 @@ const firebaseConfig = {
             if (entriesListener) entriesListener(); if (settingsListener) settingsListener();
         }
     });
-    // (Restante da lógica de autenticação)
     loginForm.addEventListener('submit', e => { e.preventDefault(); handleAuth(loginForm, auth.signInWithEmailAndPassword.bind(auth)); });
     signupForm.addEventListener('submit', e => { e.preventDefault(); handleAuth(signupForm, auth.createUserWithEmailAndPassword.bind(auth)); });
     logoutButton.addEventListener('click', () => auth.signOut());
@@ -87,7 +84,7 @@ const firebaseConfig = {
     function updateGoalProgress(currentGanhos) { if(filter.value==='this_month'&&userSettings.ganhosMetaMensal>0){const m=userSettings.ganhosMetaMensal,p=Math.min((currentGanhos/m)*100,100);goalProgressContainer.innerHTML=`<div class="goal-text"><span>Meta Mensal</span><span>${formatCurrency(currentGanhos)} / ${formatCurrency(m)}</span></div><div class="progress-bar"><div class="progress-bar-inner" style="width:${p}%;"></div></div>`;goalProgressContainer.classList.remove('hidden');}else{goalProgressContainer.classList.add('hidden');} }
     function updateCharts(data, expenseTotals, goalData) { const textColor='#8b949e',gridColor='rgba(139,148,158,0.2)',chartBg='#1C1C1C'; const ctxLucro=document.getElementById('lucroChart').getContext('2d'),ctxGastos=document.getElementById('gastosChart').getContext('2d'),ctxWeeklyGoal=document.getElementById('weeklyGoalChart').getContext('2d'); if(lucroChart)lucroChart.destroy();if(gastosChart)gastosChart.destroy();if(weeklyGoalChart)weeklyGoalChart.destroy(); const sortedData=[...data].sort((a,b)=>new Date(a.date)-new Date(b.date)); lucroChart=new Chart(ctxLucro,{type:'bar',data:{labels:sortedData.map(e=>formatDate(e.date)),datasets:[{label:'Lucro Bruto Diário',data:sortedData.map(e=>e.lucro),backgroundColor:sortedData.map(e=>e.lucro>=0?'#4CAF50':'#D32F2F'),borderRadius:4,}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Lucro Bruto (Filtrado)',color:textColor,font:{size:14}}},scales:{y:{beginAtZero:true,ticks:{color:textColor},grid:{color:gridColor}},x:{ticks:{color:textColor},grid:{color:'transparent'}}}}}); if(Object.values(expenseTotals).some(v=>v>0)){gastosChart=new Chart(ctxGastos,{type:'doughnut',data:{labels:['Combustível','Outros','Aluguer'],datasets:[{data:[expenseTotals.totalCombustivel,expenseTotals.totalOutros,expenseTotals.totalAluguel],backgroundColor:['#F57C00','#757575','#D32F2F'],borderColor:chartBg,borderWidth:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{title:{display:true,text:'Distribuição de Gastos',color:textColor,font:{size:14}},legend:{position:'top',labels:{color:textColor}}}}});} const weeklyGoal=userSettings.ganhosMetaMensal/4.33; if(weeklyGoal>0){const progresso=goalData.currentWeekGanhos,restante=Math.max(0,weeklyGoal-progresso),percentage=weeklyGoal>0?Math.round((progresso/weeklyGoal)*100):0;weeklyGoalChart=new Chart(ctxWeeklyGoal,{type:'doughnut',data:{labels:['Alcançado','Faltam'],datasets:[{data:[progresso,restante],backgroundColor:['#4CAF50','rgba(139,148,158,0.2)'],borderColor:chartBg,borderWidth:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{title:{display:true,text:'Meta da Semana Atual',color:textColor,font:{size:14}},legend:{display:false},tooltip:{enabled:false},doughnutLabel:{text:`${percentage}%`}}}});} }
 
-    // --- LÓGICA DA IA ---
+    // --- LÓGICA DA IA (CORRIGIDA) ---
     async function generateAIReport() {
         const spinner = aiReportContainer.querySelector('.spinner-container');
         aiReportContent.innerHTML = '';
@@ -123,7 +120,7 @@ const firebaseConfig = {
 
         Com base nestes dados, forneça um relatório conciso e fácil de entender em formato Markdown, com os seguintes pontos:
 
-        ###  análise Rápida
+        ### Análise Rápida
         Faça um resumo de uma ou duas frases sobre o desempenho geral no período.
 
         ### 🎯 Pontos Fortes
@@ -136,15 +133,38 @@ const firebaseConfig = {
         - Sugira 2 ou 3 ações **práticas e específicas** que o motorista pode tomar para aumentar o seu lucro líquido, baseando-se diretamente nos dados apresentados.
         `;
 
+        const apiKey = ""; // Deixe em branco para usar a chave fornecida pelo ambiente
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        
+        const payload = {
+            contents: [{
+                role: 'user', 
+                parts: [{ text: prompt }]
+            }],
+        };
+
         try {
-            const result = await gemini.generateContent({
-                contents: [{
-                    role: 'user', 
-                    parts: [{ text: prompt }]
-                }],
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
             });
-            const text = await result.response.text();
-            aiReportContent.innerHTML = marked.parse(text); // Usa a biblioteca Marked para converter Markdown para HTML
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                const text = result.candidates[0].content.parts[0].text;
+                aiReportContent.innerHTML = marked.parse(text); 
+            } else {
+                throw new Error("Resposta da IA inválida ou vazia.");
+            }
+
         } catch (error) {
             console.error("Erro ao gerar relatório de IA:", error);
             aiReportContent.textContent = "Desculpe, não foi possível gerar a análise neste momento. Tente novamente mais tarde.";
@@ -155,7 +175,6 @@ const firebaseConfig = {
     }
 
     // --- EVENT LISTENERS ---
-    // (Restante dos listeners: forms, tabela, etc.)
     form.addEventListener('submit',e=>{e.preventDefault();if(!userId)return;const nE={date:dateInput.value,ganhos:parseFloat(ganhos.value)||0,km:parseFloat(km.value)||0,horas:parseTimeToDecimal(horas.value),combustivel:parseFloat(combustivel.value)||0,outros:parseFloat(outros.value)||0,};nE.lucro=nE.ganhos-nE.combustivel-nE.outros;db.collection('users').doc(userId).collection('entries').add(nE).catch(console.error);form.reset();dateInput.valueAsDate=new Date();horasInput.value="00:00";});
     recurringForm.addEventListener('submit',e=>{e.preventDefault();if(!userId)return;db.collection('users').doc(userId).set({aluguelSemanal:parseFloat(aluguelSemanalInput.value)||0},{merge:true}).catch(console.error);});
     goalForm.addEventListener('submit',e=>{e.preventDefault();if(!userId)return;db.collection('users').doc(userId).set({ganhosMetaMensal:parseFloat(goalInput.value)||0},{merge:true}).catch(console.error);});
