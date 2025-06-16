@@ -11,7 +11,6 @@
 </head>
 <body>
 
-    <!-- Ecrã de Autenticação -->
     <div id="auth-container">
         <div class="card auth-card">
             <h1>📊 Planilha Inteligente</h1>
@@ -31,7 +30,6 @@
         </div>
     </div>
 
-    <!-- Ecrã Principal da Aplicação -->
     <div id="app-container" class="container hidden">
         <div class="header">
             <h1>📊 Planilha Inteligente</h1>
@@ -90,6 +88,21 @@
         </div>
         
         <div class="card">
+            <h2>Análise com IA ✨</h2>
+            <div class="ai-section">
+                <p>Receba uma análise detalhada dos seus resultados e dicas para otimizar os seus ganhos.</p>
+                <button id="generate-ai-report">Gerar Relatório Financeiro</button>
+                <div id="ai-report-container" class="hidden">
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                        <span>A analisar os seus dados...</span>
+                    </div>
+                    <div id="ai-report-content"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
             <h2>Histórico de Lançamentos</h2>
             <div class="table-wrapper">
                 <table id="entries-table">
@@ -105,7 +118,6 @@
         </div>
     </div>
 
-    <!-- Modal de Edição (escondido) -->
     <div id="edit-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h2>Editar Lançamento</h2>
@@ -130,6 +142,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <script src="script.js"></script>
 </body>
 </html>
