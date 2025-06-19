@@ -8,7 +8,6 @@ const firebaseConfig = {
   messagingSenderId: "228090160448",
   appId: "1:228090160448:web:c5d0656d235043b5ba86a5"
 };
-
     // INICIALIZAÇÃO
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -69,13 +68,8 @@ const firebaseConfig = {
     const formatDecimalToTime = decimal => { const hours = Math.floor(decimal); const minutes = Math.round((decimal - hours) * 60); return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`; };
     const getWeekIdentifier = date => { date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())); date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7)); const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1)); return `${date.getUTCFullYear()}-${Math.ceil((((date - yearStart) / 864e5) + 1) / 7)}`; };
     
-    function render() {
-        renderTable();
-        updateDashboard();
-    }
-    
+    function render() { renderTable(); updateDashboard(); }
     function getFilteredEntries() { const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate()),firstDayThisMonth=new Date(now.getFullYear(),now.getMonth(),1),firstDayLastMonth=new Date(now.getFullYear(),now.getMonth()-1,1),lastDayLastMonth=new Date(now.getFullYear(),now.getMonth(),0),sevenDaysAgo=new Date(today);sevenDaysAgo.setDate(today.getDate()-6); const fv=filter.value; if(fv==='all')return localEntries; return localEntries.filter(e=>{const ed=new Date(e.date+'T00:00:00-03:00');switch(fv){case'this_month':return ed>=firstDayThisMonth&&ed<=now;case'last_month':return ed>=firstDayLastMonth&&ed<=lastDayLastMonth;case'today':return ed.getTime()===today.getTime();case'last_7_days':return ed>=sevenDaysAgo&&ed<=today;default:return true;}}); }
-
     function renderTable() { const fE=getFilteredEntries(); fE.sort((a,b)=>{let av=a[sortConfig.key],bv=b[sortConfig.key];if(sortConfig.key==='date'){av=new Date(av);bv=new Date(bv);}return(av<bv?-1:av>bv?1:0)*(sortConfig.direction==='asc'?1:-1);}); tableBody.innerHTML=''; if(fE.length===0){tableBody.innerHTML='<tr><td colspan="8" style="text-align:center">Nenhum lançamento encontrado.</td></tr>';return;} fE.forEach(e=>{const r=document.createElement('tr');r.innerHTML=`<td>${formatDate(e.date)}</td><td>${formatCurrency(e.ganhos)}</td><td>${e.km.toFixed(1)} km</td><td>${formatDecimalToTime(e.horas)}</td><td>${formatCurrency(e.combustivel)}</td><td>${formatCurrency(e.outros)}</td><td class='${e.lucro>=0?'lucro':'gasto'}'>${formatCurrency(e.lucro)}</td><td><button class='edit-btn' data-id='${e.id}'>✏️</button><button class='delete-btn' data-id='${e.id}'>🗑️</button></td>`;tableBody.appendChild(r);}); }
     
     function updateDashboard() {
@@ -83,9 +77,7 @@ const firebaseConfig = {
         const totalGanhos = filteredEntries.reduce((s, e) => s + e.ganhos, 0); const totalCombustivel = filteredEntries.reduce((s, e) => s + e.combustivel, 0); const totalOutros = filteredEntries.reduce((s, e) => s + e.outros, 0); const totalKm = filteredEntries.reduce((s, e) => s + e.km, 0); const totalHoras = filteredEntries.reduce((s, e) => s + e.horas, 0); let totalAluguel = 0;
         if (filteredEntries.length > 0 && userSettings.aluguelSemanal > 0) { const uW = new Set(); filteredEntries.forEach(e => uW.add(getWeekIdentifier(new Date(e.date + 'T00:00:00-03:00')))); totalAluguel = uW.size * userSettings.aluguelSemanal; }
         const totalGastos = totalCombustivel + totalOutros + totalAluguel; const totalLucroLiquido = totalGanhos - totalGastos; const ganhosPorKm = totalKm > 0 ? totalGanhos / totalKm : 0; const ganhosPorHora = totalHoras > 0 ? totalGanhos / totalHoras : 0; const lucroPorKm = totalKm > 0 ? totalLucroLiquido / totalKm : 0;
-        
         currentDashboardData = { totalGanhos, totalCombustivel, totalOutros, totalAluguel, totalGastos, totalLucroLiquido, totalKm, totalHoras, ganhosPorKm, ganhosPorHora, lucroPorKm };
-        
         dashboard.innerHTML = `<div class='stat-card'><h3>Lucro Líquido</h3><p class='lucro'>${formatCurrency(totalLucroLiquido)}</p></div><div class='stat-card'><h3>Ganhos Totais</h3><p>${formatCurrency(totalGanhos)}</p></div><div class='stat-card'><h3>Gastos Totais</h3><p class='gasto'>${formatCurrency(totalGastos)}</p></div><div class='stat-card'><h3>Ganhos por Km</h3><p>${formatCurrency(ganhosPorKm)}</p></div><div class='stat-card'><h3>Ganhos por Hora</h3><p>${formatCurrency(ganhosPorHora)}</p></div><div class='stat-card'><h3>Lucro por Km</h3><p class='${lucroPorKm >= 0 ? 'lucro' : 'gasto'}'>${formatCurrency(lucroPorKm)}</p></div><div class='stat-card'><h3>Total Km</h3><p>${totalKm.toFixed(1)}</p></div><div class='stat-card'><h3>Total Horas</h3><p>${formatDecimalToTime(totalHoras)}</p></div>`;
         const currentWeekId = getWeekIdentifier(new Date()); const currentWeekEntries = localEntries.filter(e => getWeekIdentifier(new Date(e.date + 'T00:00:00-03:00')) === currentWeekId); const currentWeekGanhos = currentWeekEntries.reduce((s, e) => s + e.ganhos, 0);
         updateCharts(filteredEntries, { totalCombustivel, totalOutros, totalAluguel }, { currentWeekGanhos });
@@ -107,27 +99,32 @@ const firebaseConfig = {
             spinner.classList.add('hidden'); generateReportBtn.disabled = false; return;
         }
 
+        // CORREÇÃO: Coloque a sua chave da API do Google AI Studio aqui
+        const geminiApiKey = "AIzaSyDvPGlooRBuwvrzuKKcoqr3-hQ5S9xMl8I";
         const dataSummary = ` - Período do Filtro: ${filter.options[filter.selectedIndex].text}\n - Lucro Líquido Total: ${formatCurrency(currentDashboardData.totalLucroLiquido)}\n - Ganhos Totais: ${formatCurrency(currentDashboardData.totalGanhos)}\n - Gastos Totais: ${formatCurrency(currentDashboardData.totalGastos)} (Combustível: ${formatCurrency(currentDashboardData.totalCombustivel)}, Aluguer: ${formatCurrency(currentDashboardData.totalAluguel)}, Outros: ${formatCurrency(currentDashboardData.totalOutros)})\n - Total de Horas Trabalhadas: ${formatDecimalToTime(currentDashboardData.totalHoras)}\n - Total de Km Rodados: ${currentDashboardData.totalKm.toFixed(1)} km\n - Média de Ganhos por Hora: ${formatCurrency(currentDashboardData.ganhosPorHora)}\n - Média de Ganhos por Km: ${formatCurrency(currentDashboardData.ganhosPorKm)}\n `;
         const prompt = `Você é um consultor financeiro especialista em otimizar os ganhos de motoristas de aplicativo. Analise os seguintes dados financeiros de um motorista para o período selecionado. DADOS FINANCEIROS: ${dataSummary} Com base nestes dados, forneça um relatório conciso e fácil de entender em formato Markdown, com os seguintes pontos: ### Análise Rápida\nFaça um resumo de uma ou duas frases sobre o desempenho geral no período.\n\n### 🎯 Pontos Fortes\n- Destaque 1 ou 2 métricas positivas (ex: bom R$/Km, dias de alto lucro, controlo de custos) e explique por que são boas.\n\n### ⚠️ Pontos de Melhoria\n- Identifique 1 ou 2 áreas onde há oportunidade de melhoria (ex: gastos com combustível acima da média, baixo R$/Hora) e explique o impacto.\n\n### actionable Plan\n- Sugira 2 ou 3 ações **práticas e específicas** que o motorista pode tomar para aumentar o seu lucro líquido, baseando-se diretamente nos dados apresentados.`;
         
-        const apiKey = ""; 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
         const payload = { contents: [{ role: 'user', parts: [{ text: prompt }] }], };
 
         try {
             const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+            if (!response.ok) {
+                const errorBody = await response.json();
+                console.error("Erro da API da IA:", errorBody);
+                throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+            }
             const result = await response.json();
             
             if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
                 const text = result.candidates[0].content.parts[0].text;
                 aiReportContent.innerHTML = marked.parse(text); 
             } else {
-                throw new Error("Resposta da IA inválida ou vazia. Verifique a resposta completa: " + JSON.stringify(result));
+                throw new Error("Resposta da IA inválida ou vazia.");
             }
         } catch (error) {
             console.error("Erro ao gerar relatório de IA:", error);
-            aiReportContent.textContent = "Desculpe, não foi possível gerar a análise neste momento. Verifique a sua conexão ou tente novamente mais tarde.";
+            aiReportContent.textContent = "Desculpe, não foi possível gerar a análise. Verifique se a sua chave da API está correta e se o faturamento do projeto Google Cloud está ativo.";
         } finally {
             spinner.classList.add('hidden'); generateReportBtn.disabled = false;
         }
@@ -150,4 +147,3 @@ const firebaseConfig = {
     // --- INICIALIZAÇÃO ---
     dateInput.valueAsDate = new Date();
 });
-
