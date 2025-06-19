@@ -1,0 +1,54 @@
+📊 Planilha Inteligente para Motorista
+Este é um aplicativo web completo para o controlo financeiro de motoristas de aplicativo. A ferramenta permite um registo detalhado das operações diárias e oferece um painel de controlo com métricas de desempenho e análises inteligentes para ajudar a otimizar os ganhos.
+
+O projeto foi construído com HTML, CSS e JavaScript puros, e utiliza o Google Firebase para autenticação de utilizadores e armazenamento de dados na nuvem, garantindo segurança e acesso a partir de qualquer dispositivo.
+
+✨ Funcionalidades Principais
+O aplicativo foi desenhado para ser uma ferramenta completa, oferecendo:
+
+Autenticação Segura: Sistema de login e registo com e-mail e senha para proteger os seus dados.
+
+Armazenamento na Nuvem: Todos os dados são guardados no Firebase, permitindo que aceda à sua conta de qualquer computador ou telemóvel sem perder informações.
+
+Registo Diário Detalhado: Registe facilmente os seus ganhos, quilómetros rodados, horas trabalhadas e despesas variáveis (combustível, outros gastos).
+
+Painel de Controlo Dinâmico: Um resumo visual com as métricas mais importantes para a sua performance:
+
+Lucro Líquido
+
+Ganhos e Gastos Totais
+
+Rendimento por Km (R$/Km)
+
+Rendimento por Hora (R$/Hora)
+
+Custo por Km
+
+Gestão de Despesas Fixas: Adicione custos recorrentes, como o aluguer semanal do veículo, para um cálculo de lucro mais preciso.
+
+Metas de Ganhos: Defina uma meta de ganhos mensal e acompanhe o seu progresso através de uma barra visual e de um gráfico semanal.
+
+Gráficos Visuais:
+
+Gráfico de barras para a evolução do lucro diário.
+
+Gráfico de rosca (doughnut) para a distribuição dos gastos.
+
+Gráfico de rosca para o progresso da meta semanal com a percentagem no centro.
+
+Edição e Exclusão: Altere ou apague facilmente qualquer lançamento diretamente do histórico.
+
+Análise com Inteligência Artificial: Obtenha relatórios gerados pela IA (Google Gemini) com pontos fortes, pontos de melhoria e um plano de ação para otimizar os seus resultados.
+
+Exportação de Dados: Exporte os seus dados filtrados para um ficheiro CSV a qualquer momento.
+
+🛠️ Tecnologias Utilizadas
+Frontend: HTML5, CSS3, JavaScript (ES6+)
+
+Base de Dados e Autenticação: Google Firebase (Authentication e Firestore)
+
+Gráficos: Chart.js
+
+Inteligência Artificial: Google Gemini API
+
+Hospedagem: GitHub Pages
